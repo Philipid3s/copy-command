@@ -15,14 +15,26 @@ const COMMANDS: Item[] = [
   { id: 'gemini-1', category: 'Gemini CLI', content: 'gemini "explain the following code: [CODE]"', description: 'Ask Gemini to explain code snippets', tags: ['ai', 'gemini', 'explain'] },
   { id: 'gemini-2', category: 'Gemini CLI', content: 'gemini analyze [PATH]', description: 'Analyze a specific path in the codebase', tags: ['ai', 'gemini', 'analyze'] },
   { id: 'gemini-3', category: 'Gemini CLI', content: 'gemini --help', description: 'Show all available Gemini CLI commands', tags: ['ai', 'gemini', 'help'] },
+  { id: 'gemini-4', category: 'Gemini CLI', content: 'npm install -g @google/gemini-cli', description: 'Install or update Gemini CLI', tags: ['ai', 'gemini', 'update'] },
+  { id: 'gemini-5', category: 'Gemini CLI', content: '/model', description: 'Open interactive model picker (inside chat)', tags: ['ai', 'gemini', 'models'] },
+  { id: 'gemini-6', category: 'Gemini CLI', content: 'gemini --model [MODEL_NAME]', description: 'Start Gemini with a specific model', tags: ['ai', 'gemini', 'config'] },
+  { id: 'gemini-7', category: 'Gemini CLI', content: '/stats model', description: 'Show current model, token usage, and limits', tags: ['ai', 'gemini', 'limit'] },
   
   // Codex CLI
   { id: 'codex-1', category: 'Codex CLI', content: 'codex chat "[QUESTION]"', description: 'Interactive chat with Codex for coding questions', tags: ['ai', 'codex', 'css'] },
   { id: 'codex-2', category: 'Codex CLI', content: 'codex complete "[FUNCTION_STUB]"', description: 'Autocomplete code using Codex', tags: ['ai', 'codex', 'complete'] },
+  { id: 'codex-3', category: 'Codex CLI', content: 'npm install -g @openai/codex-cli', description: 'Install or update Codex CLI', tags: ['ai', 'codex', 'update'] },
+  { id: 'codex-4', category: 'Codex CLI', content: '/model list', description: 'List available models (inside chat)', tags: ['ai', 'codex', 'models'] },
+  { id: 'codex-5', category: 'Codex CLI', content: '/model [MODEL_NAME]', description: 'Switch models (inside chat)', tags: ['ai', 'codex', 'config'] },
+  { id: 'codex-6', category: 'Codex CLI', content: '/status', description: 'Show current model and session status', tags: ['ai', 'codex', 'limit'] },
   
   // Claude CLI
   { id: 'claude-1', category: 'Claude CLI', content: 'claude "review this PR: [PR_LINK]"', description: 'Ask Claude to review a pull request', tags: ['ai', 'claude', 'pr'] },
   { id: 'claude-2', category: 'Claude CLI', content: 'claude -p "Refactor this for performance: [CODE]"', description: 'Ask Claude to refactor code', tags: ['ai', 'claude', 'refactor'] },
+  { id: 'claude-3', category: 'Claude CLI', content: 'npm install -g @anthropic-ai/claude-code', description: 'Install or update Claude CLI', tags: ['ai', 'claude', 'update'] },
+  { id: 'claude-4', category: 'Claude CLI', content: '/model', description: 'Open interactive model selector (inside chat)', tags: ['ai', 'claude', 'models'] },
+  { id: 'claude-5', category: 'Claude CLI', content: 'claude --model [MODEL_NAME]', description: 'Start Claude with a specific model', tags: ['ai', 'claude', 'config'] },
+  { id: 'claude-6', category: 'Claude CLI', content: 'claude config', description: 'View current CLI configuration and model', tags: ['ai', 'claude', 'limit'] },
 
   // Node & NPM
   { id: 'npm-1', category: 'NPM', content: 'npm init -y', description: 'Quickly initialize a new project', tags: ['node', 'npm', 'init'] },
