@@ -53,6 +53,7 @@ const COMMANDS: Item[] = [
   { id: 'pg-3', category: 'PostgreSQL', content: 'pg_dump -U [USER] [DB_NAME] > backup.sql', description: 'Backup a PostgreSQL database', tags: ['database', 'postgres', 'backup'] },
 
   // Git
+  { id: 'git-0', category: 'Git', content: 'git clone [REPO_URL]', description: 'Clone a repository into a new directory', tags: ['git', 'clone', 'setup'] },
   { id: 'git-1', category: 'Git', content: 'git checkout -b [BRANCH_NAME]', description: 'Create and switch to a new branch', tags: ['git', 'branch'] },
   { id: 'git-2', category: 'Git', content: 'git commit -am "[MESSAGE]"', description: 'Add all changes and commit', tags: ['git', 'commit'] },
   { id: 'git-3', category: 'Git', content: 'git push origin [BRANCH]', description: 'Push local commits to remote', tags: ['git', 'push'] },
@@ -209,146 +210,161 @@ function App() {
 
   return (
     <div className="app-container">
-      <header>
-        <div className="header-content">
-          <div className="logo-badge">v1.2.0</div>
-          <h1>Dev<span className="accent">Cmds</span></h1>
-          <p className="subtitle">Interactive toolkit for modern fullstack & AI development</p>
-          
-          <div className="view-toggle">
-            <button className={`toggle-btn ${viewMode === 'terminal' ? 'active' : ''}`} onClick={() => handleViewToggle('terminal')}>
-              <Terminal size={18} /> Terminal
-            </button>
-            <button className={`toggle-btn ${viewMode === 'prompts' ? 'active' : ''}`} onClick={() => handleViewToggle('prompts')}>
-              <MessageSquare size={18} /> AI Prompts
-            </button>
+      <header className="compact-header">
+        <div className="header-left">
+          <div className="logo-group">
+            <h1>Dev<span className="accent">Cmds</span></h1>
+            <div className="logo-badge">v1.2.0</div>
           </div>
         </div>
-      </header>
-
-      <div className="controls">
-        <div className="search-row">
+        
+        <div className="header-center">
           <div className="search-wrapper">
-            <Search className="search-icon" size={20} />
+            <Search className="search-icon" size={18} />
             <input 
               type="text" 
-              placeholder={`Search ${viewMode === 'terminal' ? 'commands' : 'prompts'}, tags...`} 
+              placeholder={`Search ${viewMode === 'terminal' ? 'commands' : 'prompts'}...`} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {(searchTerm || selectedTag || selectedCategory !== 'All') && (
               <button className="clear-filters" onClick={resetFilters} title="Clear all filters">
-                <X size={16} />
+                <X size={14} />
               </button>
             )}
           </div>
         </div>
-        
-        <div className="filter-group">
-          <div className="category-filters">
-            {categories.map(cat => (
-              <button key={cat} className={`filter-btn ${selectedCategory === cat ? 'active' : ''}`} onClick={() => setSelectedCategory(cat)}>
-                {cat}
-              </button>
-            ))}
-          </div>
 
-          <div className="tag-cloud">
-            <div className="tag-cloud-label"><Hash size={12} /> Popular Tags:</div>
-            {allTags.map(tag => (
-              <button 
-                key={tag} 
-                className={`tag-chip ${selectedTag === tag ? 'active' : ''}`}
-                onClick={() => handleTagClick(tag)}
-              >
-                {tag}
-              </button>
-            ))}
+        <div className="header-right">
+          <div className="view-toggle">
+            <button className={`toggle-btn ${viewMode === 'terminal' ? 'active' : ''}`} onClick={() => handleViewToggle('terminal')}>
+              <Terminal size={16} /> <span className="hide-mobile">Terminal</span>
+            </button>
+            <button className={`toggle-btn ${viewMode === 'prompts' ? 'active' : ''}`} onClick={() => handleViewToggle('prompts')}>
+              <MessageSquare size={16} /> <span className="hide-mobile">Prompts</span>
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="results-info">
-        Showing <strong>{filteredItems.length}</strong> {viewMode === 'terminal' ? 'commands' : 'prompts'}
-        {selectedTag && <span> for tag <span className="active-tag-label">#{selectedTag}</span></span>}
-      </div>
-
-      <main className="commands-grid">
-        {filteredItems.length > 0 ? (
-          filteredItems.map(item => {
-            const vars = extractVars(item.content);
-            return (
-              <div key={item.id} className={`command-card ${viewMode === 'prompts' ? 'prompt-card' : ''}`}>
-                <div className="card-header">
-                  <span className="category-badge">
-                    {viewMode === 'prompts' && <Sparkles size={12} style={{marginRight: '4px'}} />}
-                    {item.category}
-                  </span>
-                  <div className="tags">
-                    {item.tags.map(tag => (
-                      <span 
-                        key={tag} 
-                        className={`tag clickable-tag ${selectedTag === tag ? 'active' : ''}`}
-                        onClick={() => handleTagClick(tag)}
-                        title={`Filter by #${tag}`}
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                <p className="description">{item.description}</p>
-                
-                {vars.length > 0 && (
-                  <div className="variable-inputs">
-                    <div className="var-header">
-                      <Variable size={14} />
-                      <span>Variables</span>
-                    </div>
-                    <div className="var-grid">
-                      {vars.map(v => (
-                        <div key={v} className="var-field">
-                          <label>{v.toLowerCase().replace(/_/g, ' ')}</label>
-                          <input 
-                            type="text" 
-                            placeholder={v}
-                            value={(itemVars[item.id] || {})[v] || ''}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => handleVarChange(item.id, v, e.target.value)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="command-box">
-                  <code className={viewMode === 'prompts' ? 'prompt-text' : ''}>
-                    {getSubstitutedContent(item)}
-                  </code>
-                  <button 
-                    className={`copy-btn ${copiedId === item.id ? 'copied' : ''}`}
-                    onClick={() => copyToClipboard(item)}
-                    title="Copy to clipboard"
-                  >
-                    {copiedId === item.id ? <Check size={18} /> : <Copy size={18} />}
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="no-results">
-            {viewMode === 'terminal' ? <Terminal size={48} /> : <MessageSquare size={48} />}
-            <p>No results found for your active filters.</p>
-            <button className="reset-btn" onClick={resetFilters}>Reset all filters</button>
+      <div className="main-layout">
+        <aside className="sidebar">
+          <div className="sidebar-section">
+            <h3><Terminal size={14} /> Apps</h3>
+            <div className="category-list">
+              {categories.map(cat => (
+                <button 
+                  key={cat} 
+                  className={`sidebar-item ${selectedCategory === cat ? 'active' : ''}`} 
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
-        )}
-      </main>
 
-      <footer>
+          <div className="sidebar-section">
+            <h3><Hash size={14} /> Tags</h3>
+            <div className="tag-list">
+              {allTags.map(tag => (
+                <button 
+                  key={tag} 
+                  className={`sidebar-tag ${selectedTag === tag ? 'active' : ''}`}
+                  onClick={() => handleTagClick(tag)}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        <main className="content-area">
+          <div className="results-info">
+            Showing <strong>{filteredItems.length}</strong> {viewMode === 'terminal' ? 'commands' : 'prompts'}
+            {selectedTag && <span> for tag <span className="active-tag-label">#{selectedTag}</span></span>}
+            {selectedCategory !== 'All' && <span> in <span className="active-tag-label">{selectedCategory}</span></span>}
+          </div>
+
+          <div className="commands-grid">
+            {filteredItems.length > 0 ? (
+              filteredItems.map(item => {
+                const vars = extractVars(item.content);
+                return (
+                  <div key={item.id} className={`command-card ${viewMode === 'prompts' ? 'prompt-card' : ''}`}>
+                    <div className="card-header">
+                      <span className="category-badge">
+                        {viewMode === 'prompts' && <Sparkles size={12} style={{marginRight: '4px'}} />}
+                        {item.category}
+                      </span>
+                      <div className="tags">
+                        {item.tags.map(tag => (
+                          <span 
+                            key={tag} 
+                            className={`tag clickable-tag ${selectedTag === tag ? 'active' : ''}`}
+                            onClick={() => handleTagClick(tag)}
+                            title={`Filter by #${tag}`}
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <p className="description">{item.description}</p>
+                    
+                    {vars.length > 0 && (
+                      <div className="variable-inputs">
+                        <div className="var-header">
+                          <Variable size={14} />
+                          <span>Variables</span>
+                        </div>
+                        <div className="var-grid">
+                          {vars.map(v => (
+                            <div key={v} className="var-field">
+                              <label>{v.toLowerCase().replace(/_/g, ' ')}</label>
+                              <input 
+                                type="text" 
+                                placeholder={v}
+                                value={(itemVars[item.id] || {})[v] || ''}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleVarChange(item.id, v, e.target.value)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="command-box">
+                      <code className={viewMode === 'prompts' ? 'prompt-text' : ''}>
+                        {getSubstitutedContent(item)}
+                      </code>
+                      <button 
+                        className={`copy-btn ${copiedId === item.id ? 'copied' : ''}`}
+                        onClick={() => copyToClipboard(item)}
+                        title="Copy to clipboard"
+                      >
+                        {copiedId === item.id ? <Check size={18} /> : <Copy size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="no-results">
+                {viewMode === 'terminal' ? <Terminal size={48} /> : <MessageSquare size={48} />}
+                <p>No results found for your active filters.</p>
+                <button className="reset-btn" onClick={resetFilters}>Reset all filters</button>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+
+      <footer className="compact-footer">
         <div className="footer-content">
-          <p>DevCmds Toolkit &copy; 2026</p>
+          <p>DevCmds &copy; 2026</p>
           <div className="footer-links">
             <a href="https://github.com" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={14} /></a>
           </div>
